@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * This class represents task in the to-do list 
+ * @author netan
+ *
+ */
 public class Item {
 	
 	private int serialnumber;

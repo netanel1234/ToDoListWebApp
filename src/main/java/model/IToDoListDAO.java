@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * IToDoListDAO interface that lists the methods through which the web application uses the database
+ */
 public interface IToDoListDAO {
 	
 	public void addItem(Item item) throws ToDoListException;

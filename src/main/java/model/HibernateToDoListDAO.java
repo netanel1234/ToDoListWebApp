@@ -1,27 +1,37 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * This class implements IToDoListDAO. It's use Hibernate. 
+ * This class implements the DAO pattern. Every communication with the data base, done from here. 
+ * To ensure there's only one instance of SesseinFactory class, it's also implements Singleton pattern.  
+ */
 public class HibernateToDoListDAO implements IToDoListDAO{
 	
 	private static HibernateToDoListDAO dao=null;		
 	private SessionFactory factory=null;
 	
+	/**
+	 * constructor
+	 */
 	private HibernateToDoListDAO()
 	{
 		factory=new AnnotationConfiguration().configure().buildSessionFactory();
 	}
 	
+	/**
+	 * Singleton pattern - get instance of HibernateToDoListDAO
+	 * @return instance of HibernateToDoListDAO
+	 */
 	public static HibernateToDoListDAO getInstance()
 	{
 		if(dao==null)
@@ -29,6 +39,9 @@ public class HibernateToDoListDAO implements IToDoListDAO{
 		return dao;
 	}
 
+	/**
+	 * Adding task to the Items table
+	 */
 	@Override
 	public void addItem(Item item) throws ToDoListException 
 	{
@@ -51,6 +64,9 @@ public class HibernateToDoListDAO implements IToDoListDAO{
 		}
 	}
 
+	/**
+	 * Deleting task from Items table
+	 */
 	@Override
 	public void deleteItem(Item item) throws ToDoListException 
 	{
@@ -73,6 +89,13 @@ public class HibernateToDoListDAO implements IToDoListDAO{
 		}
 	}
 	
+	/**
+	 * get user id by username and password
+	 * @param username 
+	 * @param password
+	 * @return user id as String
+	 * @throws ToDoListException
+	 */
 	public String getUserIdByUsernameAndPassword(String username,String password) throws ToDoListException
 	{
 		Session session=factory.openSession();
@@ -100,6 +123,12 @@ public class HibernateToDoListDAO implements IToDoListDAO{
 		return id;
 	}
 	
+	/**
+	 * get the text of the task by serial number of the task 
+	 * @param serial - serial number of the task 
+	 * @return - the text of the task
+	 * @throws ToDoListException
+	 */
 	public String getStringTask(int serial) throws ToDoListException 
 	{
 		Session session=factory.openSession();
@@ -127,6 +156,9 @@ public class HibernateToDoListDAO implements IToDoListDAO{
 		return task;
 	}
 
+	/**
+	 * change the text of a task
+	 */
 	@Override
 	public void updateItem(Item item) throws ToDoListException 
 	{
@@ -149,6 +181,9 @@ public class HibernateToDoListDAO implements IToDoListDAO{
 		}
 	}
 
+	/**
+	 * get array of task using user id
+	 */
 	@Override
 	public Item[] getItems(int id) throws ToDoListException 
 	{
@@ -176,6 +211,9 @@ public class HibernateToDoListDAO implements IToDoListDAO{
 		return items;
 	}
 
+	/**
+	 * add user to USERS table
+	 */
 	@Override
 	public int addUser(User user) throws ToDoListException 
 	{
@@ -200,6 +238,9 @@ public class HibernateToDoListDAO implements IToDoListDAO{
 		return user.getUserid();
 	}
 
+	/**
+	 * get all users in the data base
+	 */
 	@Override
 	public User[] getUsers() throws ToDoListException 
 	{
@@ -227,141 +268,3 @@ public class HibernateToDoListDAO implements IToDoListDAO{
 	}
 
 }
-
-/*
-public class HibernateToDoListDAO<T> implements IToDoListDAO<T> {
-
-    @Override
-    public void add(T ob) throws ToDoListException {
-        Session session = factory.openSession();
-        try {
-        	// preparing session to "work"
-            session.beginTransaction();
-            session.save(ob);
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            if (session.getTransaction() != null) {
-            	//not to lose data
-                session.getTransaction().rollback();
-            }
-            throw new ToDoListException("Cant add the item into the DB", e);
-        } finally {
-            try {
-                session.close();
-            } catch (HibernateException e) {
-                e.getMessage();
-            }
-        }
-    }
-
-    @Override
-    public void update(T ob) throws ToDoListException {
-        Session session = factory.openSession();
-        try {
-            session.beginTransaction();
-            session.update(ob);
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
-            throw new ToDoListException("Cant update the item in the DB", e);
-        } finally {
-            try {
-                session.close();
-            } catch (HibernateException e) {
-                e.getMessage();
-            }
-        }
-    }
-
-    @Override
-    public void delete(T ob) throws ToDoListException {
-        Session session = factory.openSession();
-        try {
-            session.beginTransaction();
-            session.delete(ob);
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
-            throw new ToDoListException("Cant delete the item from the DB", e);
-        } finally {
-            try {
-                session.close();
-            } catch (HibernateException e) {
-                e.getMessage();
-            }
-        }
-    }
-
-    /**
-     * get all items from the DB of specific user with specific id
-     *
-     * @param id
-     * @return array of items
-     * @throws ToDoListException
-     *
-    @Override
-    public Item[] getItems(Long id) throws ToDoListException {
-        Session session = factory.openSession();
-        //get with criteria to return every object that corresponds to the Item class
-        Criteria criteria = session.createCriteria(Item.class);
-        Item[] items = null;
-        try {
-            session.beginTransaction();
-            // get items of specific user
-            List<Item> itemList = criteria.add(Restrictions.eq("userID", id)).list();
-            items = new Item[itemList.size()];
-            items = itemList.toArray(items);
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
-            throw new ToDoListException("cant get the items from the DB", e);
-        } finally {
-            try {
-                session.close();
-            } catch (HibernateException e) {
-                e.getMessage();
-            }
-        }
-        return items;
-    }
-
-    /**
-     * get a user from the DB
-     *
-     * @param id
-     * @return User object
-     * @throws ToDoListException
-     *
-    @Override
-    public User getUser(Long id) throws ToDoListException {
-        Session session = factory.openSession();
-        User user = null;
-        try {
-            session.beginTransaction();
-            user = (User) session.get(User.class, id);
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
-            throw new ToDoListException("cant get the items from the DB", e);
-        } finally {
-            try {
-                session.close();
-            } catch (HibernateException e) {
-                e.getMessage();
-            }
-        }
-
-        return user;
-    }
-
-}
-
- */

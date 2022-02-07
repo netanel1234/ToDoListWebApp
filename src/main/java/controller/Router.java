@@ -14,44 +14,36 @@ import javax.servlet.http.HttpServletResponse;
 import model.*;
 
 /**
- * Servlet implementation class Router
+ * This servlet works like router. it's get requests from the clients, 
+ * and according to each request, by reflaction, creates the requested controller and sends
+ * the information this controller need to activate the right action.
+ * it's done by invoking the right method. 
+ * once the action done it's forwarding the execution to the jsp file 
+ * represents the response to the client.
  */
 @WebServlet("/router/*")
 public class Router extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
 	private static String pkg="controller";
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+   
     public Router() {
         super();
-        
     }
     
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * the method get the request, analyzing the query string, and uses reflaction to create the right
+	 * controller and to invoke the right action in it.
+	 * once the action done, it's forwarding the execution to the right jsp file 
+	 * represents the response.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
-		
-		System.out.println("we are in the Router...");		
-		PrintWriter out=response.getWriter();
 				
-		String[] queryStringArr=request.getQueryString().toString().split("=|\\&");
-		System.out.println("printing the query string...");
-		for(String str: queryStringArr)
-			System.out.println("<br>"+str);
-		
 		String[] pathInfoArr=request.getPathInfo().toString().split("/");
-		System.out.println("printing the path info...");
-		for(String str:pathInfoArr)
-			System.out.println("<br>"+str);
-		
 		String controller=pathInfoArr[1];
 		String action=pathInfoArr[2];
-		//composing the controller name
+		/*composing the controller name*/
 		String controllerClassName=controller.substring(0,1).toUpperCase()+controller.substring(1)+"Controller";
-		System.out.println("<br>"+"controller name->"+controllerClassName);
 		try
 		{
 			Class clazz=Class.forName(pkg+"."+controllerClassName);
@@ -67,11 +59,7 @@ public class Router extends HttpServlet {
 		}
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * This class represents for each user
+ * @author netan
+ *
+ */
 public class User {
 	
 	private int userid;
@@ -35,7 +40,6 @@ public class User {
 	public void setUserid(int userid) {
 		this.userid = userid;
 	}
-	
 	
 	@Override
 	public String toString() {
