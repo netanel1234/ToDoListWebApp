@@ -18,16 +18,11 @@ public class UserController {
 	
 	public void register(HttpServletRequest request, HttpServletResponse response) 
 	{
-		System.out.println("register in my UserController...");
-		System.out.println("request.getQueryString()->"+request.getQueryString());
 		String[] queryStringArr = request.getQueryString().toString().split("=|\\&");
-		for(String str: queryStringArr)
-			System.out.println("<br>"+str);
 		int id=-1;
 		try 
 		{
 			id=dao.addUser(new User(queryStringArr[1],queryStringArr[3]));
-			System.out.println("user id in register method->"+id);
 			request.setAttribute("id", String.valueOf(id));
 		} 
 		catch (ToDoListException e) 
@@ -42,11 +37,7 @@ public class UserController {
 	
 	public void congrat(HttpServletRequest request, HttpServletResponse response)
 	{
-		System.out.println("in method congrat() in UserController");
-		System.out.println("request.getQueryString()->"+request.getQueryString());
 		String[] queryStringArr = request.getQueryString().toString().split("=|\\&");
-		for(String str:queryStringArr)
-			System.out.println(str);
 		String id=null;
 		try
 		{
@@ -68,11 +59,7 @@ public class UserController {
 
 	public void add(HttpServletRequest request, HttpServletResponse response) 
 	{
-		System.out.println("in method add() in UserController");
-		System.out.println("request.getQueryString()->"+request.getQueryString());
 		String[] queryStringArr = request.getQueryString().toString().split("=|\\&");
-		for(String str:queryStringArr)
-			System.out.println(str);
 		String id=" ";
 		try
 		{
@@ -94,11 +81,7 @@ public class UserController {
 	
 	public void delete(HttpServletRequest request, HttpServletResponse response)
 	{
-		System.out.println("in method delete() in UserController");
-		System.out.println("request.getQueryString()->"+request.getQueryString());
 		String[] queryStringArr = request.getQueryString().toString().split("=|\\&");
-		for(String str:queryStringArr)
-			System.out.println(str);
 		String id=" ";
 		try
 		{
@@ -121,11 +104,7 @@ public class UserController {
 
 	public void update(HttpServletRequest request, HttpServletResponse response)
 	{
-		System.out.println("in method update() in UserController");
-		System.out.println("request.getQueryString()->"+request.getQueryString());
 		String[] queryStringArr = request.getQueryString().toString().split("=|\\&");
-		for(String str:queryStringArr)
-			System.out.println(str);
 		String id=" ";
 		try
 		{
@@ -148,24 +127,32 @@ public class UserController {
 	
 	public void login(HttpServletRequest request, HttpServletResponse response) 
 	{
-		System.out.println("in method login() in UserController");
-		System.out.println("request.getQueryString()->"+request.getQueryString());
 		String[] queryStringArr = request.getQueryString().toString().split("=|\\&");
-		for(String str:queryStringArr)
-			System.out.println(str);
-		String id=" ";
+		int id=-1;
 		try
 		{
-			id=dao.getUserIdByUsernameAndPassword(queryStringArr[1], queryStringArr[3]);
-			request.setAttribute("list", dao.getItems(Integer.valueOf(id)));
+			User[] users=dao.getUsers();
+			for(User user:users)
+				if(user.getUsername().equals(queryStringArr[1])&&user.getPassword().equals(queryStringArr[3]))
+					{
+						id=user.getUserid();
+						break;
+					}
+			if(id==-1)
+				request.setAttribute("list", String.valueOf(id));
+			else
+				request.setAttribute("list", dao.getItems(id));
 		}
 		catch(ToDoListException e)
 		{
-			System.out.println("problem in delete()..... ");
+			System.out.println("problem in login()..... ");
 			e.printStackTrace();
 		}
-		Cookie c=new Cookie("userid",String.valueOf(id));
-		c.setMaxAge(60*60*24*30);
-		response.addCookie(c);
+		if(id!=-1)
+		{
+			Cookie c=new Cookie("userid",String.valueOf(id));
+			c.setMaxAge(60*60*24*30);
+			response.addCookie(c);
+		}
 	}
 }

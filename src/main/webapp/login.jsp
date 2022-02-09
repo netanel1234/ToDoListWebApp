@@ -26,10 +26,16 @@
 	<input type="submit" />
 </form>
 <%
+		
 		if(request.getAttribute("list")!=null)
 		{
-			session.setAttribute("list", request.getAttribute("list"));
-			response.sendRedirect("/todolist/showlist.jsp");
+			if(request.getAttribute("list").equals("-1"))
+				response.sendRedirect("/todolist/notRegisterYet.jsp");
+			else
+			{
+				session.setAttribute("list", request.getAttribute("list"));
+				response.sendRedirect("/todolist/showlist.jsp");
+			}
 		}
 	%>
 </body>
